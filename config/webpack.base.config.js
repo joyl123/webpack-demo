@@ -2,6 +2,7 @@ const path = require("path");
 const HtmlWebPackPlugin = require("html-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const WebpackBar = require('webpackbar');
 //此处变量其实我没有配置好process.env.NODE_ENV
 const isProductionMode = process.env.NODE_ENV === "production";
 
@@ -101,6 +102,8 @@ module.exports = {
     ],
   },
   plugins: [
+    // 添加打包进度条
+    new WebpackBar(),
     new CleanWebpackPlugin({
       dry: false,
       cleanOnceBeforeBuildPatterns: ["../dist"],
