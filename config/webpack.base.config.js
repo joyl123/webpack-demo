@@ -11,6 +11,7 @@ module.exports = {
   resolve: {
     //import 这些后缀文件时 可以忽略后缀
     extensions: [".mjs", ".js", ".json", ".jsx", ".tsx", ".less"],
+    //别名设置
     alias: {
       "@src": path.resolve(__dirname, "../src"),
       "@components": path.resolve(__dirname, "../src/components"),
@@ -52,7 +53,10 @@ module.exports = {
       {
         test: /\.(less|css)$/,
         use: [
+            //生产环境才做样式分离
           isProductionMode ? MiniCssExtractPlugin.loader : "style-loader",
+          //无论开发还是生产 做样式抽离
+          // MiniCssExtractPlugin.loader,
           {
             loader: "css-loader",
             options: { importLoaders: 1 },
@@ -76,13 +80,7 @@ module.exports = {
         ], // 从右向左解析原则
       },
       {
-        // test: /\.(png|jpe?g|gif)$/i,
-        exclude: [
-          /\.(js|mjs|jsx|ts|tsx)$/,
-          /\.html$/,
-          /\.json$/,
-          /\.(css|less)$/,
-        ],
+        test: /\.(png|jpe?g|gif)$/i,
         use: {
           loader: "file-loader",
           options: {
@@ -92,7 +90,6 @@ module.exports = {
       },
       {
         test: /\.(tsx|ts)$/,
-        // use: "ts-loader",
         loader: "ts-loader",
         exclude: /node_modules/,
         options: {
@@ -114,11 +111,14 @@ module.exports = {
       filename: "index.html",
       inject: true,
     }),
+    new MiniCssExtractPlugin({
+      filename: "./css/common.css"
+  }),
     // require("autoprefixer"),
   ],
   devServer: {
     contentBase: path.join(__dirname, "../dist"),
     hot: true,
-    port: 3000,
+    // port: 3000,
   },
 };
