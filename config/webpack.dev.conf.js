@@ -1,4 +1,3 @@
-const path = require("path");
 const { merge } = require("webpack-merge");
 const portfinder = require("portfinder");
 const baseConfig = require("./webpack.base.config.js");
