@@ -2,7 +2,8 @@ const path = require("path");
 const HtmlWebPackPlugin = require("html-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const WebpackBar = require('webpackbar');
+const WebpackBar = require("webpackbar");
+const MycliConsolePlugin = require("../plugins/index.js");
 //此处变量其实我没有配置好process.env.NODE_ENV
 const isProductionMode = process.env.NODE_ENV === "production";
 
@@ -11,14 +12,14 @@ module.exports = {
   resolve: {
     //import 这些后缀文件时 可以忽略后缀
     extensions: [".mjs", ".js", ".json", ".jsx", ".tsx", ".less"],
-    //别名设置
+    //别名设置,文件内容待完善
     alias: {
       "@src": path.resolve(__dirname, "../src"),
       "@components": path.resolve(__dirname, "../src/components"),
       "@utils": path.resolve(__dirname, "../src/utils"),
       "@styles": path.resolve(__dirname, "../src/styles"),
-      '@constants': path.resolve(__dirname, '../src/constants'),
-      '@/types': path.resolve(__dirname, '../src/types'),
+      "@constants": path.resolve(__dirname, "../src/constants"),
+      "@/types": path.resolve(__dirname, "../src/types"),
     },
   },
   entry: {
@@ -53,7 +54,7 @@ module.exports = {
       {
         test: /\.(less|css)$/,
         use: [
-            //生产环境才做样式分离
+          //生产环境才做样式分离
           isProductionMode ? MiniCssExtractPlugin.loader : "style-loader",
           //无论开发还是生产 做样式抽离
           // MiniCssExtractPlugin.loader,
@@ -100,7 +101,7 @@ module.exports = {
   },
   plugins: [
     // 添加打包进度条
-    new WebpackBar(),
+    // new WebpackBar(),
     new CleanWebpackPlugin({
       dry: false,
       cleanOnceBeforeBuildPatterns: ["../dist"],
@@ -112,8 +113,11 @@ module.exports = {
       inject: true,
     }),
     new MiniCssExtractPlugin({
-      filename: "./css/common.css"
-  }),
+      filename: "./css/common.css",
+    }),
+    new MycliConsolePlugin({
+      dec: 1,
+    }),
     // require("autoprefixer"),
   ],
   devServer: {
