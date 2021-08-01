@@ -8,6 +8,7 @@ class RuxConsolePlugin {
   apply(compiler) {
     compiler.hooks.watchRun.tap("RuxConsolePlugin", (watching) => {
       const changeFiles = watching.watchFileSystem.watcher.mtimes;
+      // 坑 还没找到原因的 ： watching.watchFileSystem.watcher.mtimes 一直返回undefined
       for (let file in changeFiles) {
         console.log(chalk.green("当前改动文件：" + file));
       }
@@ -24,7 +25,7 @@ class RuxConsolePlugin {
     const lineSlog = slog.stdout;
     let text = "开始编译：";
     this.timer = setInterval(() => {
-      text += "█";
+      text += "=";
       lineSlog(chalk.green(text));
     }, 50);
   }

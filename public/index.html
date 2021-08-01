@@ -2,6 +2,10 @@
 <html>
   <head>
     <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,user-scalable=no"
+    />
     <title>webpack练习</title>
   </head>
   <body>
@@ -15,7 +19,7 @@
             var clientWidth = docEl.clientWidth;
             if (!clientWidth) return;
             docEl.style.fontSize = 20 * (clientWidth / 750) + "px";
-            console.log( docEl.style.fontSize,' docEl.style.fontSize')
+            console.log(docEl.style.fontSize, " docEl.style.fontSize");
           };
         if (!doc.addEventListener) return;
         win.addEventListener(resizeEvt, recalc, false);

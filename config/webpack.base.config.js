@@ -10,17 +10,19 @@ const isProductionMode = process.env.NODE_ENV === "production";
 module.exports = {
   mode: isProductionMode ? "production" : "development",
   resolve: {
-    //import 这些后缀文件时 可以忽略后缀
-    extensions: [".mjs", ".js", ".json", ".jsx", ".tsx", ".less"],
-    //别名设置,文件内容待完善
+    //import 这些后缀文件时 可以忽略后缀,查找文件的时候 从前往后依次匹配
+    extensions: [".tsx", ".ts", ".js", ".json"],
+    //alias :别名设置,
     alias: {
       "@src": path.resolve(__dirname, "../src"),
       "@components": path.resolve(__dirname, "../src/components"),
       "@utils": path.resolve(__dirname, "../src/utils"),
       "@styles": path.resolve(__dirname, "../src/styles"),
-      "@constants": path.resolve(__dirname, "../src/constants"),
-      "@/types": path.resolve(__dirname, "../src/types"),
+      "@types": path.resolve(__dirname, "../src/types"),
     },
+    modules: ["node_modules"], // 指定Webpack 去哪些目录下寻找第三方模块，提升速度，其实默认 找的就是node_modules
+    mainFields: ["main"], // package.json 中查找包的时候，优先去寻找 包里的package.json里main(脚本的执行入口)，如果没有配置，下一个mainFiles属性查找
+    mainFiles: ["index"], //对应依赖的package.json 没有配置main 字段，甚至就没有package.json ,则直接寻找包里的名为index的文件
   },
   entry: {
     app: "./src/app.js",
@@ -81,13 +83,8 @@ module.exports = {
         ], // 从右向左解析原则
       },
       {
-        test: /\.(png|jpe?g|gif)$/i,
-        use: {
-          loader: "file-loader",
-          options: {
-            name: "../static/media/[name].[hash:8].[ext]",
-          },
-        },
+        test: /\.(png|jpg|txt|ico)$/,
+        type: "asset/resource", //webpack5 拷贝文件，相当于 file-loader的作用
       },
       {
         test: /\.(tsx|ts)$/,
@@ -102,6 +99,7 @@ module.exports = {
   plugins: [
     // 添加打包进度条
     // new WebpackBar(),
+
     new CleanWebpackPlugin({
       dry: false,
       cleanOnceBeforeBuildPatterns: ["../dist"],

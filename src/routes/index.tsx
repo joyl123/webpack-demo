@@ -5,7 +5,6 @@ import Profile from "../pages/Profile";
 import Help from "../pages/Help";
 import ContactMe from "../pages/ContactMe";
 
-//eslint-disable-next-line
 export default [
   {
     path: "/",
@@ -14,7 +13,7 @@ export default [
       {
         path: "/",
         exact: true,
-        // 通过Redirect 显示默认 组件 
+        // 通过Redirect 显示默认 组件
         render: () => <Redirect to={"/profile"} />,
       },
       {
