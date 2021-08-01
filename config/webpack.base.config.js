@@ -4,6 +4,7 @@ const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const WebpackBar = require("webpackbar");
 const MycliConsolePlugin = require("../plugins/index.js");
+const webpack = require("webpack");
 //此处变量其实我没有配置好process.env.NODE_ENV
 const isProductionMode = process.env.NODE_ENV === "production";
 
@@ -68,14 +69,7 @@ module.exports = {
             loader: "postcss-loader",
             options: {
               postcssOptions: {
-                plugins: [
-                  [
-                    "postcss-preset-env",
-                    {
-                      // 选项
-                    },
-                  ],
-                ],
+                plugins: [["postcss-preset-env", {}]],
               },
             },
           },
@@ -95,6 +89,8 @@ module.exports = {
         },
       },
     ],
+    //不做解析处理，忽略的文件中 不应该含有 import, require, define 的调用，或任何其他导入机制，忽略大型的 library 可以提高构建性能
+    noParse: /lodash/, //lodash内部没有第三方依赖，在构建的时候， 可以直接忽略，不另外花时间去解析它的依赖
   },
   plugins: [
     // 添加打包进度条
@@ -117,6 +113,24 @@ module.exports = {
       dec: 1,
     }),
     // require("autoprefixer"),
+    new webpack.DefinePlugin({
+      //设置一个全局变量，实际业务场景下 至少我所负责过的使用场景是构建期间自动检测环境变化，切换我们的测试/生产环境接口
+      COPYRIGHT: {
+        AUTHOR: JSON.stringify("zoe"),
+      },
+    }),
+    /**
+     * 1:引入模块的路径的正则匹配
+     * 2:模块的名称或者是引入的目录名称
+     * 3:此处主要忽略多余的语言包的构建，测试结果 可以给包减少200kb左右体积大小（moment为例子）
+     */
+    new webpack.IgnorePlugin({
+      resourceRegExp: /^\.\/locale$/,
+      contextRegExp: /moment$/,
+    }),
+    // new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /zh-cn/),//效果类似上面的效果
+
+
   ],
   devServer: {
     contentBase: path.join(__dirname, "../dist"),

@@ -8,7 +8,6 @@ interface Props {
   // router 类型接口不好写 暂时any
   route: any;
 }
-
 const Home: React.FC<Props> = (props: Props) => {
   const { route } = props;
   return (
