@@ -5,9 +5,17 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const WebpackBar = require("webpackbar");
 const MycliConsolePlugin = require("../plugins/index.js");
 const webpack = require("webpack");
+const speedMeasureWebpackPlugin = require("speed-measure-webpack-plugin"); //打印各个模块编译的具体费时
+const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer"); //分析文件大小
+const PurgecssWebpackPlugin = require("purgecss-webpack-plugin");
+const { glob } = require("glob");
+const smw = new speedMeasureWebpackPlugin();
 //此处变量其实我没有配置好process.env.NODE_ENV
 const isProductionMode = process.env.NODE_ENV === "production";
-
+const PATHS = {
+  src: path.join(__dirname, "src"),
+};
+// smw.wrap()
 module.exports = {
   mode: isProductionMode ? "production" : "development",
   resolve: {
@@ -20,6 +28,8 @@ module.exports = {
       "@utils": path.resolve(__dirname, "../src/utils"),
       "@styles": path.resolve(__dirname, "../src/styles"),
       "@types": path.resolve(__dirname, "../src/types"),
+      "@pages": path.resolve(__dirname, "../src/pages"),
+      "@common": path.resolve(__dirname, "../src/common"),
     },
     modules: ["node_modules"], // 指定Webpack 去哪些目录下寻找第三方模块，提升速度，其实默认 找的就是node_modules
     mainFields: ["main"], // package.json 中查找包的时候，优先去寻找 包里的package.json里main(脚本的执行入口)，如果没有配置，下一个mainFiles属性查找
@@ -38,29 +48,40 @@ module.exports = {
       {
         test: /\.jsx?$/, // jsx/js文件的正则
         exclude: /node_modules/, // 排除 node_modules 文件夹
-        use: {
-          // loader 是 babel
-          loader: "babel-loader",
-          options: {
-            // babel 转义的配置选项
-            babelrc: false,
-            presets: [
-              // 添加 preset-react
-              require.resolve("@babel/preset-react"),
-              [require.resolve("@babel/preset-env"), { modules: false }],
-            ],
-            cacheDirectory: true,
+        use: [
+          {
+            loader: "thread-loader", //开启多进程打包，但只有真的大文件才有用 ，至少 当前的demo下 打包反而更慢了
+            options: {
+              workers: 3,
+            },
           },
-        },
+          {
+            // loader 是 babel
+            loader: "babel-loader",
+            options: {
+              // babel 转义的配置选项
+              babelrc: false,
+              presets: [
+                // 添加 preset-react
+                require.resolve("@babel/preset-react"),
+                [require.resolve("@babel/preset-env"), { modules: false }],
+              ],
+              cacheDirectory: true,
+            },
+          },
+        ],
       },
 
       {
         test: /\.(less|css)$/,
+        exclude: /node_modules/,
         use: [
-          //生产环境才做样式分离
-          isProductionMode ? MiniCssExtractPlugin.loader : "style-loader",
+          // //生产环境才做样式分离
+          // isProductionMode ? MiniCssExtractPlugin.loader : "style-loader",
           //无论开发还是生产 做样式抽离
           // MiniCssExtractPlugin.loader,
+
+          { loader: MiniCssExtractPlugin.loader },
           {
             loader: "css-loader",
             options: { importLoaders: 1 },
@@ -76,9 +97,10 @@ module.exports = {
           "less-loader",
         ], // 从右向左解析原则
       },
+
       {
         test: /\.(png|jpg|txt|ico)$/,
-        type: "asset/resource", //webpack5 拷贝文件，相当于 file-loader的作用
+        type: "asset/resource", //webpack5 新用法，相当于 file-loader的作用
       },
       {
         test: /\.(tsx|ts)$/,
@@ -93,7 +115,10 @@ module.exports = {
     noParse: /lodash/, //lodash内部没有第三方依赖，在构建的时候， 可以直接忽略，不另外花时间去解析它的依赖
   },
   plugins: [
-    // 添加打包进度条
+    //包大小分析
+    // new BundleAnalyzerPlugin(),
+
+    // 添加打包进度条,后改为使用自己的写的plugin
     // new WebpackBar(),
 
     new CleanWebpackPlugin({
@@ -107,8 +132,12 @@ module.exports = {
       inject: true,
     }),
     new MiniCssExtractPlugin({
-      filename: "./css/common.css",
+      filename: "[name].css",
     }),
+    // new PurgecssWebpackPlugin({
+    //   //扫描src下所有未使用到的css 的清理
+    //   paths: glob.sync(`${PATHS.src}/**/*`, { nodir: true }), //// 不匹配目录，只匹配文件
+    // }),
     new MycliConsolePlugin({
       dec: 1,
     }),
@@ -129,9 +158,11 @@ module.exports = {
       contextRegExp: /moment$/,
     }),
     // new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /zh-cn/),//效果类似上面的效果
-
-
   ],
+  experiments: {
+    //       启用试验性的支持
+    asset: true, //支持asset
+  },
   devServer: {
     contentBase: path.join(__dirname, "../dist"),
     hot: true,

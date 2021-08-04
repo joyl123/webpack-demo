@@ -12,7 +12,7 @@ const Home: React.FC<Props> = (props: Props) => {
   const { route } = props;
   return (
     <div className={"Home"}>
-      <div className="top"> ZOE 今年27</div>
+      <div className="top"> ZOE 今年27 ZOE 今年27</div>
       <div className="tab">
         <NavLink to="/profile" activeClassName="selected">
           <span className="tabItem"> profile </span>

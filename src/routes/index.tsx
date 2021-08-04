@@ -1,9 +1,6 @@
 import React from "react";
 import { Redirect } from "react-router-dom";
-import Home from "../pages/Home";
-import Profile from "../pages/Profile";
-import Help from "../pages/Help";
-import ContactMe from "../pages/ContactMe";
+import { Home, Profile, Help, ContactMe } from "@pages/index";
 
 export default [
   {

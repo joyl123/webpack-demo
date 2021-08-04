@@ -3,3 +3,5 @@ dist
 .DS_Store
 package-lock
 yarn.lock
+reademe.md
+ package-lock.json

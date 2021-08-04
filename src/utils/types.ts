@@ -1,107 +1,46 @@
+const curring = (fn: Function) => {
+  const exec = (sumArgs: any[]) => {
+    //如果当前传入的参数个数小于函数参数的个数,需要返回一个新的函数,并且保留当前函数传入的参数 递归
+    return sumArgs.length >= fn.length
+      ? fn(...sumArgs)
+      : (...args: any[]) => exec([...sumArgs, ...args]);
+  };
+  return exec([]); //用于收集每次执行时计入的参数,第一次默认为空
+};
+const isType = (typing: string) => {
+  // 回想什么是高阶函数 函数的入参是一个函数,或者这个函数return一个函数
+  //这里利用高阶函数 来保存参数(高阶函数其实就是一种闭包 这是我自己的理解)
+  return function (val: unknown) {
+    return Object.prototype.toString.call(val) === `[object ${typing}]`;
+  };
+};
+export const isString = curring(isType)("String");
+export const isNumber = curring(isType)("Number");
+export const isArray = curring(isType)("Array");
+export const isFunction = curring(isType)("Function");
+export const isObject = curring(isType)("Object");
+
 /**
- * 获取类型字符串
- * @param {*} value The value to check
- * @return {String} type string
+ * 判断值是否为空
+ * @param value
  */
-export function typeOf(value: any): string {
-    const typestr = Object.prototype.toString.call(value);
-    return typestr.substring(8, typestr.length - 1).toLowerCase();
+export function isEmpty(value: any) {
+  switch (typeof value) {
+    case "undefined":
+      return true;
+    case "string":
+      if (value.length === 0) return true;
+      break;
+    case "boolean":
+      if (!value) return true;
+      break;
+    case "number":
+      if (0 === value || isNaN(value)) return true;
+      break;
+    case "object":
+      if (null === value || value.length === 0) return true;
+      if (JSON.stringify(value) === "{}") return true;
+      break;
   }
-  
-  /**
-   * 是否字符串
-   * @param    {*}                   value  The value to check.
-   * @return   {Boolean}             'true' if the value is Array, else 'false'.
-   */
-  export function isString(value: any): value is string {
-    return typeOf(value) === 'string';
-  }
-  
-  /**
-   * 是否是数组
-   * @param    {*}                   value  The value to check.
-   * @return   {Boolean}             'true' if the value is Array, else 'false'.
-   */
-  export function isArray(value: any): value is any[] {
-    return Array.isArray ? Array.isArray(value) : typeOf(value) === 'array';
-  }
-  
-  /**
-   * 是否对象
-   * @param    {*}                   value  The value to check.
-   * @return   {Boolean}             'true' if the value is Array, else 'false'.
-   */
-  export function isObject(value: any): value is { [key: string]: any } {
-    return typeOf(value) === 'object';
-  }
-  
-  /**
-   * 是否NaN
-   * @param    {*}                   value  The value to check.
-   * @return   {Boolean}             'true' if the value is Array, else 'false'.
-   */
-  export function isNaN(value: any): value is number {
-    return value !== value;
-  }
-  
-  /**
-   * 是否数字
-   * @param    {*}                   value  The value to check.
-   * @return   {Boolean}             'true' if the value is Array, else 'false'.
-   */
-  export function isNumber(value: any): value is number {
-    return typeOf(value) === 'number' && !isNaN(value);
-  }
-  
-  /**
-   * 是否布尔类型
-   * @param    {*}                   value  The value to check.
-   * @return   {Boolean}             'true' if the value is Array, else 'false'.
-   */
-  export function isBoolean(value: any): boolean {
-    return typeOf(value) === 'boolean';
-  }
-  
-  /**
-   * 是否函数
-   * @param    {*}                   value  The value to check.
-   * @return   {Boolean}             'true' if the value is Array, else 'false'.
-   */
-  export function isFunction(value: any): value is (...args: any[]) => any {
-    return typeof value === 'function';
-  }
-  
-  /**
-   * 是否是数字或字符串数字
-   * @param value
-   */
-  export function isNumberLike(value: any) {
-    return isNumber(value) || isString(value)
-      ? String(+value) === String(value)
-      : false;
-  }
-  /**
-   * 判断值是否为空
-   * @param value
-   */
-  export function isEmpty(value: any) {
-    switch (typeof value) {
-      case 'undefined':
-        return true;
-      case 'string':
-        if (value.length === 0) return true;
-        break;
-      case 'boolean':
-        if (!value) return true;
-        break;
-      case 'number':
-        if (0 === value || isNaN(value)) return true;
-        break;
-      case 'object':
-        if (null === value || value.length === 0) return true;
-        if (JSON.stringify(value) === '{}') return true;
-        break;
-    }
-    return false;
-  }
-  
+  return false;
+}

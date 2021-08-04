@@ -11,7 +11,7 @@ import routes from "./routes/index";
 import "./app.less";
 
 console.log("测试下webpack.DefinePlugin里设置的全局变量，", COPYRIGHT);
-console.log("moment", moment().endOf("day").fromNow());
+console.log("moment    ", moment().endOf("day").fromNow());
 const App = () => {
   return (
     <HashRouter>
