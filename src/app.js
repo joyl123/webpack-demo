@@ -7,7 +7,7 @@ import "./app.less";
 console.log("测试下webpack.DefinePlugin里设置的全局变量，", COPYRIGHT);
 const LazyHome = React.lazy(() => import("./pages/home"));
 const LazyProfile = React.lazy(() =>
-  import(/* webpackPrefetch:true */ "./pages/profile")
+  import(/* webpackPrefetch:true */ "./pages/profile")//prefect 利用浏览器空闲时间提前预加载
 );
 const LazyHelp = React.lazy(() =>
   import(/* webpackPrefetch:true */ "./pages/help")

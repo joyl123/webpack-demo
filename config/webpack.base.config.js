@@ -38,6 +38,12 @@ module.exports = {
   entry: {
     app: "./src/app.js",
   },
+  // 效果:首次打包  8505 ms 二次打包4096 ms
+  cache: {
+    type: "filesystem",//'memory'｜'filesystem'
+    cacheDirectory: path.resolve(__dirname, "../node_modules/.cache/webpack"),
+  },
+
   output: {
     filename: "[name].[hash:8].js", // 打包后的文件名称+hash值
     path: path.resolve(__dirname, "../dist"), // 打包后的目录
@@ -66,7 +72,8 @@ module.exports = {
                 require.resolve("@babel/preset-react"),
                 [require.resolve("@babel/preset-env"), { modules: false }],
               ],
-              cacheDirectory: true,
+              // cache-loader:同样也可以
+              cacheDirectory: true, //开启缓存，babel在转义js文件过程中消耗性能较高，将babel-loader结果缓存起来，重新打包构建的时候会读取缓存，从而提高构建速度，降低消耗
             },
           },
         ],
